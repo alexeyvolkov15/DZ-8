@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.IO;
 
 enum Type
 {
@@ -22,6 +23,11 @@ class BankTransaction
     {
         Console.WriteLine("Дата операции: " + date);
         Console.WriteLine("Сумма операции: " + amount);
+    }
+
+    public override string ToString()
+    {
+        return "Дата операции: " + date + " Сумма операции: " + amount;
     }
 }
 
@@ -139,7 +145,7 @@ class BankAccount
         account.Removal(sum);
         Deposit(sum);
 
-        Console.WriteLine("Перевод выполнен успешно");
+        Console.WriteLine("Перевод денег выполнен успешно");
     }
 
     public void Print()
@@ -157,6 +163,21 @@ class BankAccount
         {
             transaction.Print();
         }
+    }
+
+    public void Dispose()
+    {
+        string fileName = "BankAccount_" + number + ".txt";
+
+        using (StreamWriter writer = new StreamWriter(fileName))
+        {
+            foreach (BankTransaction transaction in transactions)
+            {
+                writer.WriteLine(transaction);
+            }
+        }
+
+        GC.SuppressFinalize(this);
     }
 }
 
@@ -189,5 +210,10 @@ class Program
 
         Console.WriteLine("История второго счёта:");
         account2.PrintTransactions();
+
+        account1.Dispose();
+        account2.Dispose();
+
+        Console.WriteLine("История операций сохранена в файлы!");
     }
 }
